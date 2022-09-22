@@ -1,17 +1,28 @@
 import 'package:dio/dio.dart';
 
 class DioHttpClient {
-  final Dio dio = Dio();
+  final Dio _dio = Dio();
 
   DioHttpClient() {
     _setupDio();
   }
 
-  String base = 'https://api.chucknorris.io/jokes';
 
-//search path e query é parameter
   void _setupDio() {
-    dio.options.baseUrl = base;
-    dio.options.connectTimeout = const Duration(seconds: 30).inMilliseconds;
+
+    _dio.options.connectTimeout = const Duration(seconds: 30).inMilliseconds;
   }
+}
+
+extension HttpClientExtension on DioHttpClient {
+  Dio get jokesClient {
+    return _dio..options.baseUrl = 'https://api.chucknorris.io/jokes';
+  }
+
+  //not necessary!
+  /*
+  Dio avatarClient(){
+    return _dio..options.baseUrl = 'https://avatars.dicebear.com/api';
+  }
+  */
 }

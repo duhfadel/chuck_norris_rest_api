@@ -3,5 +3,10 @@ import 'package:chuck_norris_rest_api/features/dashboard/model/joke_response.dar
 class JokesState {
   bool isLoading;
   List<Result>? jokeList;
-  JokesState({this.isLoading = false, this.jokeList});
+  String? avatarText;
+  JokesState({
+    required this.isLoading,
+    this.jokeList,
+    this.avatarText,
+  });
 }
