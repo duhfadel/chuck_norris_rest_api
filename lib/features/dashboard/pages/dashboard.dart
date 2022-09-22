@@ -1,5 +1,6 @@
 import 'package:chuck_norris_rest_api/features/dashboard/cubit/jokes_cubit.dart';
 import 'package:chuck_norris_rest_api/features/dashboard/cubit/jokes_state.dart';
+import 'package:chuck_norris_rest_api/features/details_screen/details.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -7,13 +8,34 @@ class DashboardView extends StatelessWidget {
   DashboardView({super.key});
 
   final TextEditingController queryController = TextEditingController();
+  DateTime? lastPressed;
 
   @override
   Widget build(BuildContext context) {
     JokesCubit jokesCubit = context.read<JokesCubit>();
     return Scaffold(
-        backgroundColor: Colors.grey,
-        body: BlocBuilder<JokesCubit, JokesState>(
+      backgroundColor: Colors.grey,
+      body: WillPopScope(
+        onWillPop: () async {
+          final now = DateTime.now();
+          final maxDuration = Duration(seconds: 2);
+          final isWarning =
+              lastPressed == null || now.difference(lastPressed!) > maxDuration;
+          if (isWarning) {
+            lastPressed = DateTime.now();
+            final snackBar = SnackBar(
+              content: const Text('Double Click to Exit'),
+              duration: maxDuration,
+            );
+            ScaffoldMessenger.of(context)
+              ..removeCurrentSnackBar()
+              ..showSnackBar(snackBar);
+            return false;
+          } else {
+            return true;
+          }
+        },
+        child: BlocBuilder<JokesCubit, JokesState>(
             bloc: jokesCubit,
             builder: (context, state) {
               return SafeArea(
@@ -28,6 +50,9 @@ class DashboardView extends StatelessWidget {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
+                            const SizedBox(
+                              width: 4,
+                            ),
                             SizedBox(
                               width: 300,
                               height: 40,
@@ -44,16 +69,17 @@ class DashboardView extends StatelessWidget {
                               ),
                             ),
                             IconButton(
-                                onPressed: () {
-                                  String query = queryController.text;
-                                  jokesCubit.fetchData(query);
-                                  queryController.clear();
-                                },
-                                icon: const Icon(
-                                  Icons.search,
-                                  size: 30,
-                                  color: Colors.white,
-                                ))
+                              onPressed: () {
+                                String query = queryController.text;
+                                jokesCubit.fetchData(query);
+                                queryController.clear();
+                              },
+                              icon: const Icon(
+                                Icons.search,
+                                size: 30,
+                                color: Colors.white,
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -66,7 +92,17 @@ class DashboardView extends StatelessWidget {
                         itemCount: state.jokeList?.length ?? 0,
                         itemBuilder: (context, index) {
                           return InkWell(
-                            onTap: () {},
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => DetailsView(
+                                    text: state.jokeList![index].value!,
+                                    avatar: state.avatarText!,
+                                  ),
+                                ),
+                              );
+                            },
                             child: Container(
                               margin: const EdgeInsets.fromLTRB(8, 2, 8, 2),
                               padding: const EdgeInsets.all(8),
@@ -87,10 +123,12 @@ class DashboardView extends StatelessWidget {
                           height: 8,
                         ),
                       ),
-                    )
+                    ),
                   ],
                 ),
               );
-            }));
+            }),
+      ),
+    );
   }
 }

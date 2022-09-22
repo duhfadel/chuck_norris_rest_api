@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
       child: Builder(builder: (context) {
         return RepositoryProvider<JokesApi>(
           create: (context) =>
-              JokesApiImp(dio: context.read<DioHttpClient>().dio),
+              JokesApiImp(dio: context.read<DioHttpClient>().jokesClient),
           child: const MaterialApp(
             home: DashboardProvider(),
           ),
