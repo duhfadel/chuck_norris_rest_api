@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -19,7 +21,14 @@ class DetailsView extends StatelessWidget {
             child: SvgPicture.network(
                 'https://avatars.dicebear.com/api/avataaars/$avatar.svg'),
           ),
-          Text(text)
+          Container(
+            margin: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(8),
+            child: Text(
+              text,
+              style: TextStyle(fontSize: 18),
+            ),
+          )
         ],
       ),
     );
